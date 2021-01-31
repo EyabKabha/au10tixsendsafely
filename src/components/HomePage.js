@@ -111,11 +111,10 @@ class HomePage extends Component {
             <select className={this.state.validityState.work_space_role || "form-control mt-1"} type="text" name="work_space_role" placeholder="WorkSpaceRole" onChange={this.onChangeHandler} value={this.state.customerData.work_space_role} onBlur={() => this.onBlur('work_space_role', this.state.customerData.work_space_role)}>
               <option value="" id="WorkSpaceRole" >Select Customer</option>
               <option value="Viewer ">Viewer</option>
-              <option value="Collaborator">Collaborator</option>
-              <option value="Limited Collaborator">Limited Collaborator</option>
+              <option value="Limited Contributor">Limited Contributor</option>
+              <option value="Contributor">Contributor</option>
               <option value="Manager">Manager</option>
             </select>
-            {/* <input ></input> */}
             <label className="float-right text-danger">{this.state.formMessages.work_space_role}</label>
           </div>
           <div className="col-md-4 mt-3">
