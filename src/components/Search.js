@@ -22,7 +22,8 @@ class Search extends Component {
     onRowUpdate = async (dataFromTable, id) => {
         try {
             const dataFilteredTracker = dataFromTable.filter(datatracker => datatracker.id === id)
-            const data = await fetcher.put(`/tracker/edit/${id}`, dataFilteredTracker)
+            const token = localStorage.getItem('token')
+            const data = await fetcher.put(`/tracker/edit/${id}`, dataFilteredTracker, { headers: { "authorization": `token ${token}` }})
             if (data.status === 200) {
                 swal(`${data.data}`, "", "success");
                 this.setState({
@@ -36,7 +37,8 @@ class Search extends Component {
 
     onRowDelete = async (deleteFromTable, id) => {
         try {
-            const data = await fetcher.delete(`/tracker/delete/${id}`, deleteFromTable);
+            const token = localStorage.getItem('token')
+            const data = await fetcher.delete(`/tracker/delete/${id}`, deleteFromTable, { headers: { "authorization": `token ${token}` }});
             if (data.status === 200) {
                 swal(`${data.data}`, "", "success");
                 this.setState({
@@ -51,7 +53,8 @@ class Search extends Component {
     componentDidMount = async () => {
         try {
             const dataTracker = []
-            const allCustomers = await fetcher.get('/tracker');
+            const token = localStorage.getItem('token')
+            const allCustomers = await fetcher.get('/tracker',{ headers: { "authorization": `token ${token}` }});
             allCustomers.data.forEach(tracker => {
                 dataTracker.push({
                     id: tracker.id,
@@ -72,6 +75,7 @@ class Search extends Component {
     render() {
         return (
             <div className="mt-5">
+              
                 <Table data={this.state.data} columns={this.state.columns} onRowUpdate={this.onRowUpdate} onRowDelete={this.onRowDelete} />
             </div>
         );

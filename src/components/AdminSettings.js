@@ -25,8 +25,9 @@ class AdminSettings extends Component {
 
     onRowUpdate = async (dataFromTable, id) => {
         try {
+            const token = localStorage.getItem('token')
             const dataFiltered = dataFromTable.filter(account => account.id === id)
-            await fetcher.put(`/account/edit/${id}`, dataFiltered)
+            await fetcher.put(`/account/edit/${id}`, dataFiltered, { headers: { "authorization": `token ${token}` } })
         } catch (error) {
 
         }
@@ -74,7 +75,8 @@ class AdminSettings extends Component {
     }
     onRowDelete = async (deleteFromTable, id) => {
         try {
-
+            const token = localStorage.getItem('token')
+            console.log(token)
             await fetcher.delete(`/account/delete/${id}`, deleteFromTable);
             this.setState({
                 data: deleteFromTable
@@ -86,14 +88,15 @@ class AdminSettings extends Component {
     addNewAm = async () => {
         const obj = { first_name: this.state.dataAM.first_name, last_name: this.state.dataAM.last_name };
         if (!validateAccountManager(this.state.formState).done(this.handleValidationResult).hasErrors()) {
-            await fetcher.post('/account/new', obj);
+            const token = localStorage.getItem('token')
+            await fetcher.post('/account/new', obj, { headers: { "authorization": `token ${token}` } });
             this.setState({
                 data: [...this.state.data, obj],
                 dataAM: {
                     first_name: '',
                     last_name: '',
                 },
-                validityState:{}
+                validityState: {}
             })
         }
     }
@@ -105,24 +108,26 @@ class AdminSettings extends Component {
     }
     componentDidMount = async () => {
         const arrayFromDB = [];
-        const account = await fetcher.get('/account');
+        const token = localStorage.getItem('token')
+        const account = await fetcher.get('/account', { headers: { "authorization": `token ${token}` } });
         account.data.forEach(am => {
             arrayFromDB.push({ id: am.id, first_name: am.first_name, last_name: am.last_name })
         })
         this.setState({ data: arrayFromDB })
     }
+
     render() {
         return (
             <div className="container">
                 <div className="row">
                     <div className="col-md-4">
-                        <label htmlFor="first_name"className="mt-5">First Name</label>
-                        <input id="first_name"className={this.state.validityState.first_name || "form-control"} value={this.state.dataAM.first_name} type="text" name="first_name" onChange={this.onChangeHandler} onBlur={() => this.onBlur('first_name', this.state.dataAM.first_name)}></input>
+                        <label htmlFor="first_name" className="mt-5">First Name</label>
+                        <input id="first_name" className={this.state.validityState.first_name || "form-control"} value={this.state.dataAM.first_name} type="text" name="first_name" onChange={this.onChangeHandler} onBlur={() => this.onBlur('first_name', this.state.dataAM.first_name)}></input>
                         <label style={{ color: 'red' }}>{this.state.formMessages.first_name}</label>
                     </div>
                     <div className="col-md-4">
                         <label htmlFor="last_name" className="mt-5">Last Name</label>
-                        <input id="last_name"className={this.state.validityState.last_name || "form-control"} value={this.state.dataAM.last_name} type="text" name="last_name" onChange={this.onChangeHandler} onBlur={() => this.onBlur('last_name', this.state.dataAM.last_name)}></input>
+                        <input id="last_name" className={this.state.validityState.last_name || "form-control"} value={this.state.dataAM.last_name} type="text" name="last_name" onChange={this.onChangeHandler} onBlur={() => this.onBlur('last_name', this.state.dataAM.last_name)}></input>
                         <label style={{ color: 'red' }}>{this.state.formMessages.last_name}</label>
                     </div>
                     <div className="col-md-4">
