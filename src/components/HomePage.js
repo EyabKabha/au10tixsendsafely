@@ -4,6 +4,7 @@ import AddIcon from '@material-ui/icons/Add';
 import fetcher from '../api/fetcher';
 import swal from 'sweetalert';
 import { validateTrackerData } from '../shared/validation';
+import '../style/index.css'
 class HomePage extends Component {
   constructor(props) {
     super(props);
@@ -20,6 +21,7 @@ class HomePage extends Component {
       formState: {},
       formMessages: {},
       validityState: {},
+      tokenFromLogin: '',
     }
   }
   onBlur = (fieldName, value) => {
@@ -66,9 +68,11 @@ class HomePage extends Component {
     const savedData = { ...this.state.customerData, [target.name]: value };
     this.setState({ customerData: savedData });
   }
+
   onSaveClick = async () => {
     if (!validateTrackerData(this.state.formState).done(this.handleValidationResult).hasErrors()) {
-      const data = await fetcher.post('/tracker/new', this.state.customerData);
+      const token = localStorage.getItem('token')
+      const data = await fetcher.post('/tracker/new', this.state.customerData, { headers: { "authorization": `token ${token}` } });
       if (data.status === 200) {
         swal(`${data.data}`, "", "success");
         this.setState({
@@ -86,26 +90,27 @@ class HomePage extends Component {
         })
       }
     }
-
   }
+
   componentDidMount = async () => {
     try {
-      const { data } = await fetcher.get('/account');
-      this.setState({ accounts: data })
-    } catch (error) {
+      const token = localStorage.getItem('token')
+      const { data } = await fetcher.get('/account', { headers: { "authorization": `token ${token}` } });
 
+      this.setState({ accounts: data })
+    //  console.log(checkToken.checkToken())
+    } catch (error) {
+      console.log(error)
     }
   }
+
   render() {
+    // checkToken.checkToken()
+    
     return (
-
       <div className="container mt-5">
-
-
-        <h1 style={{ marginTop: '100px', backgroundColor: '#fa923f', boxSizing: 'border-box', textAlign: 'center', padding: '20px 4', color: 'white', fontSize: '1.8rem', borderRadius: '150px' }}>Send Safely Tracker</h1>
-
+        <h1 style={{ marginTop: '100px', backgroundColor: '#fa923f', boxSizing: 'border-box', textAlign: 'center', padding: '20px 4', color: 'white', fontSize: '1.8rem', borderRadius: '150px', fontFamily: 'Raleway-SemiBold' }}>Send Safely Tracker</h1>
         <div className="row mt-5">
-
           <div className="col-md-4 mt-3">
             <label htmlFor="WorkSpaceRole">WorkSpaceRole</label>
             <select className={this.state.validityState.work_space_role || "form-control mt-1"} type="text" name="work_space_role" placeholder="WorkSpaceRole" onChange={this.onChangeHandler} value={this.state.customerData.work_space_role} onBlur={() => this.onBlur('work_space_role', this.state.customerData.work_space_role)}>
